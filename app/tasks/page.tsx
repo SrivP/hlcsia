@@ -24,20 +24,17 @@ interface apiResponseTask {
     user_id : string;
 }
 
-
-
-
-
 export default function Page() {
     const [allTasks, setAllTasks] = useState<TaskObj[]>([]);
     const [update, setUpdate] = useState(false);
     const [user, setUser] = useState<string | null>();
     const [title, setTitle] = useState("");
-    const [date, setDate] = useState<Date>();
+    const [dateupdate, setDateUpdate] = useState<Date>();
     const [tags, setTags] = useState<string[]>([]);
     const [priority, setPriority] = useState(3);
     const [isComplete, setIsComplete] = useState(false);
     const [taskid, setTaskId] = useState<number[]>([]);
+    const [datenew, setDateNew] = useState<Date>();
     
     
 
@@ -51,7 +48,10 @@ export default function Page() {
           setTaskId(ids);
           setAllTasks(tasks);
           setUser(result.user_id)
-
+          for (let i = 0; i < allTasks.length; i++) {
+            console.log(allTasks[i].getDueDate(), allTasks[i].getTitle());
+          }
+        
         };
         fetchData();
       }, [update]); 
@@ -69,15 +69,16 @@ export default function Page() {
           return;
 
         }
-        if (date === undefined) {
+        if (datenew === undefined) {
           toast("Please enter a due date for the task!");
           return;
         }
-        let task = new TaskObj(id, user || "", title, priority, tags, isComplete, date);
+        let task = new TaskObj(id, user || "", title, priority, tags, isComplete, datenew);
         setAllTasks(prevTasks => ([...prevTasks, task]))
         if (priority > 3 || priority < 0) {
           toast("Make sure priority is either 1, 2 or 3!");
         } else {
+          console.log(datenew.toISOString() + "  " + datenew.toDateString())
         const response = await fetch('/api/taskData', {
           method: 'POST',
           headers: {
@@ -87,8 +88,7 @@ export default function Page() {
             title,
             priority,
             tags,
-            date,
-            user,
+            dueDate : datenew.toISOString(),
           }),
         });
         if (response.ok) {
@@ -143,7 +143,7 @@ export default function Page() {
           title : task?.getTitle(),
           priority : task?.getPriority(),
           tags : task?.getTags(),
-          dueDate: date?.toISOString() || new Date().toISOString(),
+          dueDate: dateupdate?.toISOString(),
           user_id: user,
           isComplete : checked
         })
@@ -166,7 +166,7 @@ export default function Page() {
       task?.setTitle(title);
       task?.setPriority(priority);
       task?.setTags(tags);
-      task?.setDueDate(date ? date : new Date(task?.getDueDate()) || new Date());
+      task?.setDueDate(dateupdate ? dateupdate : task?.getDueDate());
       task?.setIsCompleted(isComplete);
       setUpdate(!update)
       
@@ -175,7 +175,7 @@ export default function Page() {
         return;
 
       }
-      if (date === undefined) {
+      if (dateupdate === undefined) {
         toast("Please enter a due date for the task!");
         return;
       }
@@ -188,7 +188,7 @@ export default function Page() {
         title: title,
         priority: priority,
         tags: tags,
-        dueDate: date ? date.toISOString() : task?.getDueDate()?.toISOString() || new Date().toISOString(),
+        dueDate: dateupdate ? dateupdate : task?.getDueDate(),
         user_id: user,
         isComplete: task?.getIsCompleted() 
       };
@@ -215,8 +215,8 @@ export default function Page() {
       setTitle(task.getTitle());
       setPriority(task.getPriority());
       setTags(task.getTags());
-      setDate(new Date(task.getDueDate()));
-      console.log(title, priority, tags, date);
+      setDateUpdate(task.getDueDate());
+      console.log(title, priority, tags, dateupdate);
     }
 
     function mergeSortAscending(arr : TaskObj[], left : number, right : number) {
@@ -322,6 +322,8 @@ export default function Page() {
       toast("Tasks sorted by descending priority")
       setAllTasks([...arr]);
     }
+
+    
     
 
 
@@ -353,8 +355,8 @@ export default function Page() {
                     />
                     <Calendar
                         mode="single"
-                        selected={date}
-                        onSelect={setDate}
+                        selected={datenew}
+                        onSelect={setDateNew}
                         className="rounded-md border mb-2"
                     />
                     <Input
@@ -400,8 +402,8 @@ export default function Page() {
                   />
                   <Calendar
                     mode="single"
-                    selected={date}
-                    onSelect={setDate}
+                    selected={dateupdate}
+                    onSelect={setDateUpdate}
                     className="rounded-md border mb-2"
                   />
                   <Input
@@ -424,7 +426,7 @@ export default function Page() {
                           <p className="text-sm pb-0.5">{task.getTitle() || "Task Title Not Set 🥺"}</p>
                         </div>
                         <div>
-                          <p className="text-sm truncate pb-0.5">Due: {task.getDueDate().toDateString()}</p>
+                          <p className="text-sm truncate pb-0.5">Due: {task.getDueDate().toISOString().split("T")[0]}</p>
                         </div>
                         <div className="flex flex-wrap gap-1">
                         {task.getTags().map((tag, index) => (

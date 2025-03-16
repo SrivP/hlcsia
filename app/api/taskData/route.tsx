@@ -24,7 +24,6 @@ export async function GET() {
   data?.map((tasks) => {
     moreTasks.push(new TaskObj(tasks.id, userId, tasks.title, tasks.priority, tasks.tags, tasks.isComplete, tasks.dueDate))
   })
-
   const rdata = {
     allTasks: moreTasks,
     user_id : userId
@@ -38,13 +37,15 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  console.log("I was called!!")
   const userId = await getUserId();
   const { title, priority, tags, dueDate } = await request.json();
+  console.log("This is date new " + dueDate)
   const { error } = await supabase.from('tasks').insert({
     title,
     priority,
     tags: tags,
-    dueDate: dueDate ? new Date(dueDate).toISOString() : dueDate,
+    dueDate : dueDate,
     user_id : userId,
     isComplete: false,
   });
@@ -79,7 +80,7 @@ export async function PUT(request : NextRequest) {
     title,
     priority,
     tags: tags,
-    dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+    dueDate: dueDate,
     isComplete,
   }).eq('id', id).eq('user_id', userId)
   if (error) {
