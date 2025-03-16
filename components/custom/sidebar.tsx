@@ -13,7 +13,7 @@ import Player from "./player";
 import router from "next/router";
 import { useState } from "react";
 
-export default function sidebar() {
+export default function Sidebar() {
     const [loading, setLoading] = useState(false);
 
 
