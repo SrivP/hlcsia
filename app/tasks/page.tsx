@@ -159,14 +159,16 @@ export default function Page() {
         console.error('Error updating task:', errorData.error);
       }
     }
-    
+
+
     async function updateTask (id : number) {
       const task = allTasks.find((task) => task.getId() === id);
       task?.setTitle(title);
       task?.setPriority(priority);
       task?.setTags(tags);
-      task?.setDueDate(date ? date : task?.getDueDate() || new Date());
+      task?.setDueDate(date ? date : new Date(task?.getDueDate()) || new Date());
       task?.setIsCompleted(isComplete);
+      setUpdate(!update)
       
       if (title.replace(/\s+/g, '') === "") {
         toast("Please enter a title for the task!");
@@ -213,7 +215,7 @@ export default function Page() {
       setTitle(task.getTitle());
       setPriority(task.getPriority());
       setTags(task.getTags());
-      setDate(task.getDueDate());
+      setDate(new Date(task.getDueDate()));
       console.log(title, priority, tags, date);
     }
 
@@ -422,7 +424,7 @@ export default function Page() {
                           <p className="text-sm pb-0.5">{task.getTitle() || "Task Title Not Set 🥺"}</p>
                         </div>
                         <div>
-                          <p className="text-sm truncate pb-0.5">Due: {task.getDueDate().toLocaleDateString()}</p>
+                          <p className="text-sm truncate pb-0.5">Due: {task.getDueDate().toDateString()}</p>
                         </div>
                         <div className="flex flex-wrap gap-1">
                         {task.getTags().map((tag, index) => (
