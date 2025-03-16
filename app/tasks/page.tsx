@@ -15,6 +15,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUp01 } from 'lucide-react';
+import { ArrowUp10 } from "lucide-react";
 
   
 
@@ -367,7 +368,7 @@ export default function Page() {
                 </Popover>
                 <div className="fixed flex flex-col right-1 m-3 top-1/3 rounded-full">
                   <Button variant="ghost" onClick={() => mergeSortAscending(allTasks, 0, allTasks.length - 1)}><ArrowUp01 /></Button>
-                  <Button variant="ghost" onClick={() => {mergeSortDescending(allTasks,0,allTasks.length-1)}}><ArrowUp01 /></Button>
+                  <Button variant="ghost" onClick={() => {mergeSortDescending(allTasks,0,allTasks.length-1)}}><ArrowUp10 /></Button>
                 </div>
                 <div className="ml-[4%] w-[95vw] h-[77vh]">
                     {allTasks?.map((task)=> (
