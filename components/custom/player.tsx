@@ -31,9 +31,9 @@ export default function Player() {
 
 
     const tracks = [
-        {title : "Track 1", src : "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
-        {title : "Track 2", src : "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"},
-        {title : "Track 3", src : "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"},
+        {title : "Track 1", src : "/track1.mp3"},
+        {title : "Track 2", src : "/track2.mp3"},
+        {title : "Track 3", src : "/track3.mp3"},
     ]
 
     function togglePlay(tracknum : number ) {
