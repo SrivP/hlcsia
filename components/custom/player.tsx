@@ -39,8 +39,6 @@ export default function Player() {
     function togglePlay(tracknum : number ) {
         
         if (tracknum == track) {
-            
-        
         if (playing && audioRef.current) {
             audioRef.current.pause();
         } else if (audioRef.current) {

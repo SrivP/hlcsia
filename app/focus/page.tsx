@@ -13,10 +13,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 
+
   
 
 export default function Page() {
-    const [time, setTime] = useState(1500);
+    const [time, setTime] = useState(0);
     const [initTime, setInitTime] = useState(0);
     const [seconds, setSeconds] = useState(0);
     const [minutes, setMinutes] = useState(0);
@@ -77,6 +78,9 @@ export default function Page() {
     
 
     function handleStart() {
+      if (time <= 0) {
+        return;
+      }
         setRunning(true);
         setVariant("destructive");
         setInitTime(time)
@@ -87,7 +91,7 @@ export default function Page() {
       let second2 = seconds;
       let time2 = minute2 * 60 + second2;
       let timeCheck = minutes * 60 + seconds;
-      if (timeCheck <= 0) {
+      if (timeCheck <= 0 || isNaN(timeCheck)) {
           toast("Please set a valid time 🕰️");
           return;
       } else {
@@ -124,6 +128,7 @@ export default function Page() {
     }
     return(
         <>
+          <audio ref={audioRef} src="/chime.wav" />
             <Sidebar />
             <div className="grid place-items-center h-screen">
                 <Image
@@ -150,7 +155,7 @@ export default function Page() {
                             <Label htmlFor="minutes">Minutes</Label>
                             <Input
                                 id="minutes"
-                                placeholder={minutes.toString()}
+                                placeholder={""}
                                 className="col-span-2 h-8"
                                 onChange={(e) => setMinutes(parseInt(e.target.value))} 
                             />
@@ -159,7 +164,7 @@ export default function Page() {
                             <Label htmlFor="seconds">Seconds</Label>
                             <Input
                                 id="seconds"
-                                placeholder={seconds.toString()}
+                                placeholder={""}
                                 className="col-span-2 h-8"
                                 onChange={(e) => {
                                   setSeconds(parseInt(e.target.value))

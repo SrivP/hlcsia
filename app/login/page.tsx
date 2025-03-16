@@ -10,14 +10,7 @@ import { createClient } from "@/utils/server";
 
 
 
-export default async function Page(
-  {
-  searchParams,
-}: {
-  searchParams: { message: string };
-} ) 
-
-
+export default async function Page()
 {
   const supabase = await createClient();
 
@@ -54,11 +47,7 @@ export default async function Page(
                 required
               />
             </div>
-            {searchParams.message && (
-              <div className="text-sm font-medium text-destructive">
-                {searchParams.message}
-              </div>
-            )}
+            
             <Button formAction={login} className="w-full">
               Login
             </Button>

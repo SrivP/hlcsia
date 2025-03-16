@@ -2,7 +2,6 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-
 import { createClient } from '@/utils/server'
 
 export async function login(formData: FormData) {
@@ -20,7 +19,7 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/focus')
 }
 
 export async function signup(formData: FormData) {
@@ -51,7 +50,6 @@ export async function getUserId() {
 
 export async function signOut() {
   const supabase = await createClient();
-  (await supabase).auth.signOut();
-  redirect('/')
+  await supabase.auth.signOut();
   
 }

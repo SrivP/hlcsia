@@ -10,7 +10,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import {
     HoverCard,
-    HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
 import { Checkbox } from "@/components/ui/checkbox";
@@ -39,7 +38,6 @@ export default function page() {
     const [priority, setPriority] = useState(3);
     const [isComplete, setIsComplete] = useState(false);
     const [taskid, setTaskId] = useState<number[]>([]);
-    const [priorityList, setPriorityList] = useState<number[]>([]);
     
     
 
@@ -169,7 +167,20 @@ export default function page() {
       task?.setTags(tags);
       task?.setDueDate(date ? date : task?.getDueDate() || new Date());
       task?.setIsCompleted(isComplete);
+      
+      if (title.replace(/\s+/g, '') === "") {
+        toast("Please enter a title for the task!");
+        return;
 
+      }
+      if (date === undefined) {
+        toast("Please enter a due date for the task!");
+        return;
+      }
+
+      if (priority > 3 || priority < 0) {
+        toast("Make sure priority is either 1, 2 or 3!");
+      } else {
       const updatedData = {
         id,
         title: title,
@@ -195,7 +206,7 @@ export default function page() {
         const errorData = await response.json();
         console.error('Error updating task:', errorData.error);
       }
-
+    }
     }
     
     function captureTaskData(task : TaskObj) {
