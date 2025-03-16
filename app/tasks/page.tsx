@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/hover-card"
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { ArrowUp01 } from 'lucide-react';
+import { ArrowUp10 } from 'lucide-react';
 
   
 
@@ -34,9 +36,10 @@ export default function page() {
     const [title, setTitle] = useState("");
     const [date, setDate] = useState<Date>();
     const [tags, setTags] = useState<string[]>([]);
-    const [priority, setPriority] = useState(0);
+    const [priority, setPriority] = useState(3);
     const [isComplete, setIsComplete] = useState(false);
     const [taskid, setTaskId] = useState<number[]>([]);
+    const [priorityList, setPriorityList] = useState<number[]>([]);
     
     
 
@@ -50,6 +53,7 @@ export default function page() {
           setTaskId(ids);
           setAllTasks(tasks);
           setUser(result.user_id)
+
         };
         fetchData();
       }, [update]); 
@@ -61,6 +65,15 @@ export default function page() {
             id = Math.random() * 9223372036854775807;
             o = 0;
           }
+        }
+        if (title === "") {
+          toast("Please enter a title for the task!");
+          return;
+
+        }
+        if (date === undefined) {
+          toast("Please enter a due date for the task!");
+          return;
         }
         let task = new TaskObj(id, user || "", title, priority, tags, isComplete, date);
         setAllTasks(prevTasks => ([...prevTasks, task]))
@@ -151,14 +164,20 @@ export default function page() {
     
     async function updateTask (id : number) {
       const task = allTasks.find((task) => task.getId() === id);
+      task?.setTitle(title);
+      task?.setPriority(priority);
+      task?.setTags(tags);
+      task?.setDueDate(date ? date : task?.getDueDate() || new Date());
+      task?.setIsCompleted(isComplete);
+
       const updatedData = {
         id,
         title: title,
         priority: priority,
         tags: tags,
-        dueDate: date?.toISOString(),
+        dueDate: date ? date.toISOString() : task?.getDueDate()?.toISOString() || new Date().toISOString(),
         user_id: user,
-        isComplete: task 
+        isComplete: task?.getIsCompleted() 
       };
       
       const response = await fetch('/api/taskData', {
@@ -184,7 +203,115 @@ export default function page() {
       setPriority(task.getPriority());
       setTags(task.getTags());
       setDate(task.getDueDate());
+      console.log(title, priority, tags, date);
     }
+
+    function mergeSortAscending(arr : TaskObj[], left : number, right : number) {
+      if (left < right) {
+      let middle = Math.floor((left + right) / 2);
+      mergeSortAscending(arr, left, middle);
+      mergeSortAscending(arr, middle + 1, right);
+      merge(arr, left, right, middle);
+      }
+      function merge(arr : TaskObj[], left : number, right: number, middle: number) {
+        let l1 = middle - left + 1;
+        let l2 = right - middle;
+        let a1 = new Array(l1);
+        let a2 = new Array(l2);
+
+        for (let i = 0; i < l1; i++) {
+          a1[i] = arr[left + i];
+        }
+
+        for (let j = 0; j < l2; j++) {
+          a2[j] = arr[middle + 1 + j];
+        }
+
+        let i = 0;
+        let j = 0;
+        let k = left;
+
+        while (i < l1 && j < l2) {
+          if (a1[i].getPriority() < a2[j].getPriority()) {
+            arr[k] = a1[i];
+            i++;
+          } else {
+            arr[k] = a2[j];
+            j++;
+          }
+          k++;
+        }
+
+        while (i < l1) {
+          arr[k] = a1[i];
+          i++;
+          k++;
+        }
+
+        while (j < l2) {
+          arr[k] = a2[j];
+          j++;
+          k++;
+        }
+      }
+      toast("Tasks sorted by ascending priority")
+      setAllTasks([...arr]);
+    }
+
+    function mergeSortDescending(arr : TaskObj[], left : number, right : number) {
+      if (left < right) {
+      let middle = Math.floor((left + right) / 2);
+      mergeSortDescending(arr, left, middle);
+      mergeSortDescending(arr, middle + 1, right);
+      merge(arr, left, right, middle);
+      }
+      function merge(arr : TaskObj[], left : number, right: number, middle: number) {
+        let l1 = middle - left + 1;
+        let l2 = right - middle;
+        let a1 = new Array(l1);
+        let a2 = new Array(l2);
+
+        for (let i = 0; i < l1; i++) {
+          a1[i] = arr[left + i];
+        }
+
+        for (let j = 0; j < l2; j++) {
+          a2[j] = arr[middle + 1 + j];
+        }
+
+        let i = 0;
+        let j = 0;
+        let k = left;
+
+        while (i < l1 && j < l2) {
+          if (a1[i].getPriority() > a2[j].getPriority()) {
+            arr[k] = a1[i];
+            i++;
+          } else {
+            arr[k] = a2[j];
+            j++;
+          }
+          k++;
+        }
+
+        while (i < l1) {
+          arr[k] = a1[i];
+          i++;
+          k++;
+        }
+
+        while (j < l2) {
+          arr[k] = a2[j];
+          j++;
+          k++;
+        }
+      }
+      toast("Tasks sorted by descending priority")
+      setAllTasks([...arr]);
+    }
+    
+
+
 
     return(
         <>
@@ -195,9 +322,6 @@ export default function page() {
                         <HoverCardTrigger>
                             <BadgePlus />
                         </HoverCardTrigger>
-                        <HoverCardContent className="ease-in animate-bounce mt-3 text-sm justify-center m-1 w-36 h-10">
-                            Add New Task
-                        </HoverCardContent>
                     </HoverCard>
                     </PopoverTrigger>
                     <PopoverContent avoidCollisions side="bottom" align="center" className="max-h-96 overflow-auto">
@@ -231,6 +355,10 @@ export default function page() {
                     </Button>
                     </PopoverContent>
                 </Popover>
+                <div className="fixed flex flex-col right-1 m-3 top-1/3 rounded-full">
+                  <Button variant="ghost" onClick={() => mergeSortAscending(allTasks, 0, allTasks.length - 1)}><ArrowUp01 /></Button>
+                  <Button variant="ghost" onClick={() => {mergeSortDescending(allTasks,0,allTasks.length-1)}}><ArrowUp01 /></Button>
+                </div>
                 <div className="ml-[4%] w-[95vw] h-[77vh]">
                     {allTasks?.map((task)=> (
                       <div key={task.getId()}>
@@ -239,7 +367,7 @@ export default function page() {
                         <Button variant="outline" className="w-10 absolute top-1/2 -translate-y-1/2 -right-5 rounded-full">{task.getPriority()}</Button>
                         <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-10 absolute -bottom-2 -right-2 rounded-full" onClick={() => captureTaskData}><Pencil />
+                  <Button variant="outline" className="w-10 absolute -bottom-2 -right-2 rounded-full" onClick={() => captureTaskData(task)}><Pencil />
                   </Button>      
                 </PopoverTrigger>
                 <PopoverContent avoidCollisions side="bottom" align="center" className="max-h-96 overflow-auto">

@@ -58,6 +58,7 @@ export default function Player() {
         ref={audioRef} 
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
+        loop={playing || false}
       >
         <source src={tracks[track].src} type="audio/mpeg" />
       </audio>

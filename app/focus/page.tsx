@@ -23,6 +23,7 @@ export default function Page() {
     const [running, setRunning] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const [variant, setVariant] = useState<"default" | "secondary"| "destructive">("default");
+    const hasRunRef = useRef(false);
     
 
     
@@ -32,14 +33,17 @@ export default function Page() {
           countdown = setInterval(() => {
             setTime((prev) => {
               if (prev <= 1) {
+
+                if (!hasRunRef.current) {
+                  toast('Time is up! 🎉');
+                  hasRunRef.current = true;
+                  updateTime(time)
+                }
+                console.log("Time outside"+ time + "prev" + prev)
                 clearInterval(countdown);
                 setRunning(false);
                 if (audioRef.current) {
                   audioRef.current.play();
-                }
-                if (time == 0) {
-                  toast("Good Job!!")
-                  updateTime(initTime); 
                 }
                 setVariant("default");
                 setTime(0);
@@ -76,6 +80,7 @@ export default function Page() {
         setRunning(true);
         setVariant("destructive");
         setInitTime(time)
+        hasRunRef.current = false;
     }
     function handleTime() {
       let minute2 = minutes;
@@ -145,7 +150,7 @@ export default function Page() {
                             <Label htmlFor="minutes">Minutes</Label>
                             <Input
                                 id="minutes"
-                                placeholder="25"
+                                placeholder={minutes.toString()}
                                 className="col-span-2 h-8"
                                 onChange={(e) => setMinutes(parseInt(e.target.value))} 
                             />
@@ -154,7 +159,7 @@ export default function Page() {
                             <Label htmlFor="seconds">Seconds</Label>
                             <Input
                                 id="seconds"
-                                placeholder="00"
+                                placeholder={seconds.toString()}
                                 className="col-span-2 h-8"
                                 onChange={(e) => {
                                   setSeconds(parseInt(e.target.value))

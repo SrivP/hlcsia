@@ -24,14 +24,18 @@ export async function GET() {
     // ai code fix pls
     const { data : timeData } = await supabase.from('time').select().eq('user_id', '8a06959d-477f-45a0-bd87-f9191618de99').gte('created_at', startOfDay)
     .lt('created_at', endOfDay);
-    const { data : allTimeData } = await supabase.from('time').select().eq('user_id', '8a06959d-477f-45a0-bd87-f9191618de99')
-    if (!timeData || timeData.length === 0) {
+    const { data : allTimeData } = await supabase.from('time').select().eq('user_id', userId)
+    if (!timeData) {
       return new Response(JSON.stringify({ error: "No data found" }), {
         status: 404,
         headers: {
           "Content-Type": "application/json",
         },
       });
+    }
+
+    if (timeData.length === 0) {
+      timeData.push({ seconds: 0 });
     }
     const seconds: number = timeData[0].seconds;
     const times : TimeObj[] = [];
@@ -65,6 +69,5 @@ export async function GET() {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    console.log("This is seconds from post " + seconds);
     return NextResponse.json({ message: 'Task updated successfully: seconds ' + seconds }, { status: 200 });
   }
