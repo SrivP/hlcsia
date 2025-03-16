@@ -15,8 +15,6 @@ import { useState } from "react";
 
 export default function Sidebar() {
     const [loading, setLoading] = useState(false);
-
-
     async function handleSignout() {
         console.log("Buton pressed!!")
         setLoading(true);
@@ -25,11 +23,6 @@ export default function Sidebar() {
         sessionStorage.removeItem('auth_token');
         window.location.reload();
         router.push('/login')
-
-        
-        
-        
-         
     }
 
     return(
