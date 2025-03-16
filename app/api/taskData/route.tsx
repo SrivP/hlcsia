@@ -38,13 +38,14 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const { title, priority, tags, dueDate, user_id } = await request.json();
+  const userId = await getUserId();
+  const { title, priority, tags, dueDate } = await request.json();
   const { error } = await supabase.from('tasks').insert({
     title,
     priority,
     tags: tags,
     dueDate: dueDate ? new Date(dueDate).toISOString() : dueDate,
-    user_id,
+    user_id : userId,
     isComplete: false,
   });
 
@@ -59,9 +60,10 @@ export async function POST(request: NextRequest) {
 
 
 export async function DELETE(request: NextRequest) {
-  const {id, user_id} = await request.json();
-  const { error } = await supabase.from('tasks').delete().eq('id', id).eq('user_id', user_id);
-  console.log("here it is", id, user_id)
+  const userId = await getUserId();
+  const {id} = await request.json();
+  const { error } = await supabase.from('tasks').delete().eq('id', id).eq('user_id', userId);
+  console.log("here it is", id, userId)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -71,14 +73,15 @@ export async function DELETE(request: NextRequest) {
 
 
 export async function PUT(request : NextRequest) {
-  const { id, title, priority, tags, dueDate, user_id, isComplete} = await request.json();
+  const userId = await getUserId();
+  const { id, title, priority, tags, dueDate, isComplete} = await request.json();
   const { error } = await supabase.from('tasks').update({
     title,
     priority,
     tags: tags,
     dueDate: dueDate ? new Date(dueDate).toISOString() : null,
     isComplete,
-  }).eq('id', id).eq('user_id', user_id)
+  }).eq('id', id).eq('user_id', userId)
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

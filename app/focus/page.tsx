@@ -4,7 +4,6 @@ import Sidebar from '@/components/custom/sidebar';
 import Image from 'next/image';
 import cat from '@/public/cat.png'
 import { Button } from '@/components/ui/button';
-import { supabase } from "../api/supabase";
 import {
     Popover,
     PopoverContent,
@@ -13,8 +12,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { min } from 'date-fns';
-
 
   
 
@@ -26,8 +23,7 @@ export default function Page() {
     const [running, setRunning] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const [variant, setVariant] = useState<"default" | "secondary"| "destructive">("default");
-    const [created_at, setCreated_at] = useState<Date>();
-    const [user_id, setUser_id] = useState<string | null>();
+    
 
     
     useEffect(() => {
@@ -41,15 +37,14 @@ export default function Page() {
                 if (audioRef.current) {
                   audioRef.current.play();
                 }
-                toast("Good Job!!") 
+                if (time == 0) {
+                  toast("Good Job!!")
+                  updateTime(initTime); 
+                }
                 setVariant("default");
                 setTime(0);
                 setMinutes(0);
                 setSeconds(0);
-                console.log("This is initTime" + initTime)
-                updateTime(initTime, "8a06959d-477f-45a0-bd87-f9191618de99");
-                
-
               }
               return prev - 1;
             });
@@ -68,18 +63,14 @@ export default function Page() {
         return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`    
     }
 
-    // rewrite this function
     function handleStop() {
         setRunning(false);
         setVariant("default");
-        console.log("This is initTime" + (initTime-time))
-        setInitTime((prevInitTime) => {
-            const timeTracked = prevInitTime - time;
-            console.log("Time tracked:", timeTracked);
-            updateTime(timeTracked, user_id!); // Make sure user_id is available
-            return prevInitTime; // No need to reset initTime to time after stopping
-        });
-    }
+        const timeTracked = initTime - time;
+        updateTime(timeTracked); 
+        setInitTime(time);
+      }
+    
 
     function handleStart() {
         setRunning(true);
@@ -91,19 +82,15 @@ export default function Page() {
       let second2 = seconds;
       let time2 = minute2 * 60 + second2;
       let timeCheck = minutes * 60 + seconds;
-        if (timeCheck <= 0) {
-            toast("Please set a valid time 🕰️");
-            console.log("Everything you need boss" + seconds, minutes, time)
-            return;
-        } else {
-            setTime(time2);
-            
-
-            
-        }
+      if (timeCheck <= 0) {
+          toast("Please set a valid time 🕰️");
+          return;
+      } else {
+          setTime(time2);     
+      }
     }
 
-    async function updateTime(seconds : number, user_id : string) {
+    async function updateTime(seconds : number) {
         const response = await fetch('/api/timeData', {
           method: 'POST',
           headers: {
@@ -112,7 +99,6 @@ export default function Page() {
           body: JSON.stringify({
             seconds,
             created_at: new Date().toISOString(),
-            user_id, 
           })
         })
     
@@ -123,6 +109,14 @@ export default function Page() {
           console.error('Error updating task:', errorData.error);
         }
       }
+
+    function resetTime() {
+        setMinutes(0);
+        setSeconds(0);
+        setTime(0);
+        setRunning(false);
+        setVariant("default");
+    }
     return(
         <>
             <Sidebar />
@@ -131,7 +125,7 @@ export default function Page() {
                     src={cat} 
                     width={125}
                     height={125}
-                    alt="Picture of the author"
+                    alt="Cute Cat"
                     className="translate-y-[0%]"
                 />
                 <Popover>
@@ -168,7 +162,8 @@ export default function Page() {
                             />
                             </div>
                             <div className="grid grid-cols-3 items-center gap-4">
-                            <Button onClick={handleTime} className="col-span-2">Submit</Button>
+                              <Button onClick={handleTime} className="col-span-2">Submit</Button>
+                              <Button onClick={resetTime} className="">Reset</Button>
                             </div>
                             
                             </div>

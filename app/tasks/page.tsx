@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { TaskObj } from "./TaskObj";
 import Sidebar from "@/components/custom/sidebar"
-// import TaskBox from "@/components/custom/taskBox"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button";
 import { BadgePlus, Pencil, Trash2 } from 'lucide-react';
@@ -16,12 +15,17 @@ import {
 } from "@/components/ui/hover-card"
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+
   
 
 interface apiResponseTask {
     allTasks: TaskObj[];
     user_id : string;
 }
+
+
+
+
 
 export default function page() {
     const [allTasks, setAllTasks] = useState<TaskObj[]>([]);
@@ -32,24 +36,34 @@ export default function page() {
     const [tags, setTags] = useState<string[]>([]);
     const [priority, setPriority] = useState(0);
     const [isComplete, setIsComplete] = useState(false);
+    const [taskid, setTaskId] = useState<number[]>([]);
     
+    
+
     
     useEffect(() => {
         const fetchData = async () => {
           const response = await fetch("/api/taskData");
           const result: apiResponseTask = await response.json();
           const tasks = result.allTasks.map((task) => TaskObj.fromAPI(task));
+          const ids = tasks.map((task) => task.getId());
+          setTaskId(ids);
           setAllTasks(tasks);
           setUser(result.user_id)
-          allTasks.forEach(tasks => {
-            console.log("Task complete status" + tasks.getDueDate())
-          })
-          console.log("This is user!" + user)
         };
         fetchData();
       }, [update]); 
 
       async function addNewTask() {
+        let id = Math.random() * 9223372036854775807;
+        for (let o = 0; o < taskid?.length; o++) {
+          if (id === taskid[o]) {
+            id = Math.random() * 9223372036854775807;
+            o = 0;
+          }
+        }
+        let task = new TaskObj(id, user || "", title, priority, tags, isComplete, date);
+        setAllTasks(prevTasks => ([...prevTasks, task]))
         if (priority > 3 || priority < 0) {
           toast("Make sure priority is either 1, 2 or 3!");
         } else {
@@ -62,8 +76,8 @@ export default function page() {
             title,
             priority,
             tags,
-            dueDate: date?.toISOString(),
-            user_id: user 
+            date,
+            user,
           }),
         });
         if (response.ok) {
@@ -73,45 +87,41 @@ export default function page() {
             const errorData = await response.json();
             console.error('Error adding task:', errorData.error);
           }
-        
-
         }
     }
 
     async function deleteTask(id: number) {
+        const task = allTasks.find((task) => task.getId() === id);
+        setAllTasks((prevTasks) => prevTasks.filter((task) => task.getId() !== id));
+        toast('Task deleted successfully');
         const response = await fetch('/api/taskData', {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            id : id,
-            user_id: user, 
+            id
           }),
         });
-    
+        
         if (response.ok) {
-          toast('Task deleted successfully');
-          setAllTasks((prevTasks) => prevTasks.filter((task) => task.getId() !== id));
           setUpdate(!update);
         } else {
+          if (task) {
+            setAllTasks((prevTasks) => [...prevTasks, task]);
+          }
           const errorData = await response.json();
           console.error('Error deleting task:', errorData.error);
         }
     }
 
-    async function updateTask(id: number, checked : boolean) {
+    async function updateCheckedTask(id: number, checked : boolean) {
+      const taskidx = allTasks.findIndex((task) => task.getId() === id);
       const task = allTasks.find((task) => task.getId() === id);
-      console.log("Updating task with:", {
-        id : id,
-        title : title,
-        priority : priority,
-        tags : tags,
-        dueDate: date?.toISOString(),
-        user_id: user,
-        isComplete : checked,
+      allTasks[taskidx].setIsCompleted(checked);
+      
+      toast("Task updated successfully")
 
-      })
       const response = await fetch('/api/taskData', {
         method: 'PUT',
         headers: {
@@ -119,9 +129,9 @@ export default function page() {
         },
         body: JSON.stringify({
           id,
-          title,
-          priority,
-          tags : tags,
+          title : task?.getTitle(),
+          priority : task?.getPriority(),
+          tags : task?.getTags(),
           dueDate: date?.toISOString() || new Date().toISOString(),
           user_id: user,
           isComplete : checked
@@ -129,16 +139,52 @@ export default function page() {
       })
   
       if (response.ok) {
-        console.log('Task updated successfully');
+        setUpdate(!update); 
+      } else {
+         if (task) {
+          allTasks[taskidx].setIsCompleted(!checked);
+         }
+        const errorData = await response.json();
+        console.error('Error updating task:', errorData.error);
+      }
+    }
+    
+    async function updateTask (id : number) {
+      const task = allTasks.find((task) => task.getId() === id);
+      const updatedData = {
+        id,
+        title: title,
+        priority: priority,
+        tags: tags,
+        dueDate: date?.toISOString(),
+        user_id: user,
+        isComplete: task 
+      };
+      
+      const response = await fetch('/api/taskData', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedData)
+      })
+  
+      if (response.ok) {
         setUpdate(!update); 
         toast("Task updated successfully")
       } else {
         const errorData = await response.json();
         console.error('Error updating task:', errorData.error);
       }
-    }    
-      
+
+    }
     
+    function captureTaskData(task : TaskObj) {
+      setTitle(task.getTitle());
+      setPriority(task.getPriority());
+      setTags(task.getTags());
+      setDate(task.getDueDate());
+    }
 
     return(
         <>
@@ -193,10 +239,10 @@ export default function page() {
                         <Button variant="outline" className="w-10 absolute top-1/2 -translate-y-1/2 -right-5 rounded-full">{task.getPriority()}</Button>
                         <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-10 absolute -bottom-2 -right-2 rounded-full"><Pencil />
+                  <Button variant="outline" className="w-10 absolute -bottom-2 -right-2 rounded-full" onClick={() => captureTaskData}><Pencil />
                   </Button>      
                 </PopoverTrigger>
-                <PopoverContent>
+                <PopoverContent avoidCollisions side="bottom" align="center" className="max-h-96 overflow-auto">
                   <h4> Update Task </h4>
                   <Input
                     type="text"
@@ -223,7 +269,7 @@ export default function page() {
                     onChange={(e) => setTags(e.target.value.split(',').map(tag => tag.trim()))}
                     className="mb-2"
                   />
-                  <Button onClick={() => updateTask(task.getId(), task.getIsCompleted())}>
+                  <Button onClick={() => {updateTask(task.getId())}}>
                     Save Task
                   </Button>
                 </PopoverContent>
@@ -232,9 +278,9 @@ export default function page() {
                           <Checkbox id={`task-${task.getId()}`} checked={task.getIsCompleted()} onCheckedChange={(checked) => {
                             const newStatus = checked === "indeterminate" ? false : checked;
                             setIsComplete(newStatus);
-                            updateTask(task.getId(), newStatus);
+                            updateCheckedTask(task.getId(), newStatus);
 }} />
-                          <p className="text-sm pb-0.5">{task.getTitle() || "Grab some milk"}</p>
+                          <p className="text-sm pb-0.5">{task.getTitle() || "Task Title Not Set 🥺"}</p>
                         </div>
                         <div>
                           <p className="text-sm truncate pb-0.5">Due: {task.getDueDate().toLocaleDateString()}</p>

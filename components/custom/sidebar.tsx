@@ -1,16 +1,5 @@
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-} from "@/components/ui/carousel"
-import {
-    Card,
-    CardContent
-} from "@/components/ui/card"
 import Link from "next/link"
 import {
     DropdownMenu,
@@ -19,10 +8,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { LogOut } from 'lucide-react';
-  
-import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card"
-import { HoverCardContent } from "@radix-ui/react-hover-card"
 import { signOut } from "@/app/login/action"
+import Player from "./player";
 
 export default function sidebar() {
     return(
@@ -51,33 +38,7 @@ export default function sidebar() {
                     <Link href="/stats">Stats</Link>
                 </Button>
             </nav>
-            <Carousel className="fixed bottom-[3vh] right-15">
-                <CarouselContent>
-                    <CarouselItem>
-                        <Card>
-                            <CardContent className="flex w-1px h-1px rounded-max items-center justify-center">
-                                🌧️        
-                            </CardContent>
-                        </Card>
-                    </CarouselItem>
-                    <CarouselItem>
-                        <Card>
-                            <CardContent className="flex w-1px h-1px rounded-max items-center justify-center">
-                                🎧        
-                            </CardContent>
-                        </Card>
-                    </CarouselItem>
-                    <CarouselItem>
-                        <Card>
-                            <CardContent className="flex w-1px h-1px rounded-max items-center justify-center">
-                                🎛️        
-                            </CardContent>
-                        </Card>
-                    </CarouselItem>
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-            </Carousel>
+            <Player />
 
         
         </>

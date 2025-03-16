@@ -1,19 +1,22 @@
-import { NoteObj } from "./NoteObj";
-
-export class TaskObj extends NoteObj {
+export class TaskObj  {
   
   private dueDate: any;
   private isComplete: boolean;
   private priority: number;
-  // list : List;
+  private id : number;
+  private user_id : string;
+  private title: string;
+  private tags: string[];
 
   constructor(id : number, user_id : string, title: string, priority: number, tags: string[], isComplete : boolean, dueDate?: Date) {
-    super(id, user_id, title, tags);
+    this.title = title ?? "";
+    this.tags = tags;
+    this.user_id = user_id;
+    this.id = id;
     this.dueDate = dueDate;
     this.priority = priority;
     this.isComplete = isComplete;
   }
-
 
 
   setDueDate(newDueDate: Date) {
@@ -40,6 +43,40 @@ export class TaskObj extends NoteObj {
   setIsCompleted(isComplete : boolean) {
      this.isComplete = isComplete;
   }
+
+  getId() {
+    return this.id;
+  }
+
+  getUserId() {
+    return this.user_id;
+  }
+
+  setTitle(newtitle: string) {
+    this.title = newtitle;
+  }
+
+  getUser_id() : string {
+    return this.user_id
+  }
+
+
+
+  setTags(newTags: string[]) {
+    this.tags = newTags;
+  }
+
+  getTitle(): string {
+    return this.title;
+  }
+
+
+
+  getTags(): string[] {
+    return this.tags;
+  }
+
+  
 
   static fromAPI(data: any): TaskObj {
     return new TaskObj(

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { TimeObj } from "@/app/stats/TimeObj";
 
 
+
 export async function GET() {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
@@ -52,12 +53,14 @@ export async function GET() {
   }
   
   export async function POST(request : NextRequest) {
-    const {seconds, created_at, user_id } = await request.json();
+    const user_id = await getUserId();
+    const {seconds, created_at } = await request.json();
     const { error } = await supabase.from('time').insert({
       seconds,
       created_at,
       user_id,
     })
+    console.log("this is user id " + user_id)
     
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
