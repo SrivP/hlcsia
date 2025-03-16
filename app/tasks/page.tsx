@@ -15,7 +15,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUp01 } from 'lucide-react';
-import { ArrowUp10 } from 'lucide-react';
 
   
 
@@ -28,7 +27,7 @@ interface apiResponseTask {
 
 
 
-export default function page() {
+export default function Page() {
     const [allTasks, setAllTasks] = useState<TaskObj[]>([]);
     const [update, setUpdate] = useState(false);
     const [user, setUser] = useState<string | null>();
@@ -219,16 +218,16 @@ export default function page() {
 
     function mergeSortAscending(arr : TaskObj[], left : number, right : number) {
       if (left < right) {
-      let middle = Math.floor((left + right) / 2);
+      const middle = Math.floor((left + right) / 2);
       mergeSortAscending(arr, left, middle);
       mergeSortAscending(arr, middle + 1, right);
       merge(arr, left, right, middle);
       }
       function merge(arr : TaskObj[], left : number, right: number, middle: number) {
-        let l1 = middle - left + 1;
-        let l2 = right - middle;
-        let a1 = new Array(l1);
-        let a2 = new Array(l2);
+        const l1 = middle - left + 1;
+        const l2 = right - middle;
+        const a1 = new Array(l1);
+        const a2 = new Array(l2);
 
         for (let i = 0; i < l1; i++) {
           a1[i] = arr[left + i];

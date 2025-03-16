@@ -87,10 +87,10 @@ export default function Page() {
         hasRunRef.current = false;
     }
     function handleTime() {
-      let minute2 = minutes;
-      let second2 = seconds;
-      let time2 = minute2 * 60 + second2;
-      let timeCheck = minutes * 60 + seconds;
+      const minute2 = minutes;
+      const second2 = seconds;
+      const time2 = minute2 * 60 + second2;
+      const timeCheck = minutes * 60 + seconds;
       if (timeCheck <= 0 || isNaN(timeCheck)) {
           toast("Please set a valid time 🕰️");
           return;
@@ -147,7 +147,7 @@ export default function Page() {
                         <div className="space-y-2">
                             <h4 className="font-medium leading-none">Set Time</h4>
                             <p className="text-sm text-muted-foreground">
-                            Set the amount of time you'd like to focus for (in seconds).
+                            Set the amount of time you&apos;d like to focus for.
                             </p>
                         </div>
                         <div className="grid gap-2">

@@ -10,7 +10,6 @@ export async function GET() {
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
     const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
     const userId = await getUserId();
-    const month = new Date().getMonth();
     console.log(userId);
     if (!userId) {
       return new Response(JSON.stringify({ error: "User not authenticated" }), {

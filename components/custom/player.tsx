@@ -30,7 +30,7 @@ export default function Player() {
     }, [track])
 
 
-    let tracks = [
+    const tracks = [
         {title : "Track 1", src : "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
         {title : "Track 2", src : "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"},
         {title : "Track 3", src : "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"},

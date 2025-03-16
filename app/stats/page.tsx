@@ -27,7 +27,7 @@ interface apiResponseTask {
     allTimeData : TimeObj[];
 }
 
-export default function page() {
+export default function Page() {
     const [taskNum, setTaskNum] = useState(0);
     const [hoursDone, setHoursDone] = useState("");
     const [completedT, setCompletedT] = useState(0);
