@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUp01 } from 'lucide-react';
 import { ArrowUp10 } from "lucide-react";
+import { setDate } from "date-fns";
 
   
 
@@ -91,6 +92,7 @@ export default function Page() {
             dueDate : datenew.toISOString(),
           }),
         });
+        setDateNew(new Date());
         if (response.ok) {
             toast('Task added successfully');
             setUpdate(!update);
@@ -374,10 +376,10 @@ export default function Page() {
                   <Button variant="ghost" onClick={() => mergeSortAscending(allTasks, 0, allTasks.length - 1)}><ArrowUp01 /></Button>
                   <Button variant="ghost" onClick={() => {mergeSortDescending(allTasks,0,allTasks.length-1)}}><ArrowUp10 /></Button>
                 </div>
-                <div className="ml-[4%] w-[95vw] h-[77vh]">
+                <div className="ml-[4%] w-[95vw] h-[77vh] flex flex-col flex-wrap overflow-auto gap-x-0.5" style={{ maxHeight: '77vh' }}>
                     {allTasks?.map((task)=> (
                       <div key={task.getId()}>
-                        <div className="m-6 relative w-[12vw] min-h-[15vh] rounded-md shadow-md border-2 border-gray-200 p-4 flex flex-col justify-between">
+                        <div className="mt-4 relative w-[12vw] min-h-[15vh] rounded-md shadow-md border-2 border-gray-200 p-4 flex flex-col justify-between basis-sm">
                         <Button variant="outline" className="w-10 absolute -top-2 -right-2 rounded-full" onClick={() => {deleteTask(task.getId())}}><Trash2/></Button>
                         <Button variant="outline" className="w-10 absolute top-1/2 -translate-y-1/2 -right-5 rounded-full">{task.getPriority()}</Button>
                         <Popover>
