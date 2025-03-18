@@ -20,7 +20,6 @@ export async function GET() {
       });
     }
   
-    // ai code fix pls
     const { data : timeData } = await supabase.from('time').select().eq('user_id', '8a06959d-477f-45a0-bd87-f9191618de99').gte('created_at', startOfDay)
     .lt('created_at', endOfDay);
     const { data : allTimeData } = await supabase.from('time').select().eq('user_id', userId)
